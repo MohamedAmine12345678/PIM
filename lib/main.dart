@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:safetravel/providers/advice_provider.dart';
+import 'package:safetravel/providers/emergency_provider.dart';
 import 'package:safetravel/screens/Weather_screen.dart';
  // Import the translate screen
 import 'package:safetravel/screens/FeedScreen.dart';
@@ -27,6 +29,8 @@ class SafeTravelApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (ctx) => PostsProvider()),
         ChangeNotifierProvider(create: (ctx) => CommentsProvider()),
+        ChangeNotifierProvider(create: (_) => AdviceProvider()),
+        ChangeNotifierProvider(create: (_) => EmergencyProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

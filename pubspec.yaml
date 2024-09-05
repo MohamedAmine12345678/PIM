@@ -47,6 +47,9 @@ dependencies:
   url_launcher: ^6.0.20
   share_plus: ^6.3.0
   google_maps_flutter: ^2.0.6
+  video_player: ^2.5.0
+  twilio_flutter: ^0.9.0
+  location: ^4.4.0
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +70,13 @@ flutter:
   assets:
     - assets/globe.jpg
     - assets/logo.png
+    - assets/3678380-hd_1920_1080_30fps.mp4
+    - assets/vecteezy_slow-motion-rain-background_30756198.mp4
+    - assets/7579667-uhd_2160_4096_25fps.mp4
+    - assets/20945544.jpg
+    - assets/8979495-hd_1080_1920_30fps.mp4
+    - assets/9669392-hd_1080_1920_30fps.mp4
+    - assets/6133772-uhd_4096_2160_25fps.mp4
 
 
 

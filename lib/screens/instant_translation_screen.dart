@@ -16,7 +16,6 @@ class _InstantTranslationScreenState extends State<InstantTranslationScreen> {
   bool _isLoading = false;
   bool _isListening = false;
 
-  // Initialize _speech as nullable and lazy initialize
   stt.SpeechToText? _speech;
 
   final _languages = {
@@ -100,7 +99,6 @@ class _InstantTranslationScreenState extends State<InstantTranslationScreen> {
   }
 
   void _initializeSpeech() async {
-    // Initialize _speech and handle any errors
     _speech = stt.SpeechToText();
     bool available = await _speech!.initialize(
       onStatus: (val) => print('onStatus: $val'),
@@ -138,10 +136,9 @@ class _InstantTranslationScreenState extends State<InstantTranslationScreen> {
   }
 
   void _listen() async {
-    // Lazy initialization of _speech if it's null
     if (_speech == null) {
       _speech = stt.SpeechToText();
-      _initializeSpeech(); // Ensure it initializes but does not await it
+      _initializeSpeech();
     }
 
     if (!_isListening) {
@@ -166,66 +163,96 @@ class _InstantTranslationScreenState extends State<InstantTranslationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true, // Extend the body behind the transparent AppBar
       appBar: AppBar(
         title: Text('Instant Translation'),
-        backgroundColor: Color(0xFF162447),
+        backgroundColor: Colors.black.withOpacity(0.4), // Transparent black header
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildDropdown(
-              'From Language',
-              _sourceLanguage,
-                  (value) => setState(() => _sourceLanguage = value!),
+      body: Stack(
+        children: [
+          // Background Image
+          SizedBox.expand(
+            child: Image.asset(
+              'assets/20945544.jpg', // Use your provided image
+              fit: BoxFit.cover,
             ),
-            SizedBox(height: 20),
-            _buildDropdown(
-              'To Language',
-              _targetLanguage,
-                  (value) => setState(() => _targetLanguage = value!),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Enter text',
-                border: OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
-                  onPressed: _listen,
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _inputText = value;
-                });
-              },
-              controller: TextEditingController(text: _inputText),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _translateText,
-              child: _isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
-                  : Text('Translate'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF4077FF),
+          ),
+          // Semi-transparent overlay to make text readable
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.3)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
-            SizedBox(height: 20),
-            if (_translatedText.isNotEmpty)
-              Text(
-                _translatedText,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF162447),
-                ),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // This ensures the column is centered
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildDropdown(
+                    'From Language',
+                    _sourceLanguage,
+                        (value) => setState(() => _sourceLanguage = value!),
+                  ),
+                  SizedBox(height: 20),
+                  _buildDropdown(
+                    'To Language',
+                    _targetLanguage,
+                        (value) => setState(() => _targetLanguage = value!),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Enter text',
+                      filled: true,
+                      fillColor: Colors.black.withOpacity(0.3), // Semi-transparent
+                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(_isListening ? Icons.mic : Icons.mic_none, color: Colors.white),
+                        onPressed: _listen,
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) {
+                      setState(() {
+                        _inputText = value;
+                      });
+                    },
+                    controller: TextEditingController(text: _inputText),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _translateText,
+                    child: _isLoading ? CircularProgressIndicator(color: Colors.white) : Text('Translate'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black.withOpacity(0.5), // Semi-transparent button
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  if (_translatedText.isNotEmpty)
+                    Text(
+                      _translatedText,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                ],
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -234,8 +261,15 @@ class _InstantTranslationScreenState extends State<InstantTranslationScreen> {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        filled: true,
+        fillColor: Colors.black.withOpacity(0.3), // Semi-transparent background
+        labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
+        ),
       ),
+      dropdownColor: Colors.black.withOpacity(0.8), // Dark dropdown background
+      style: TextStyle(color: Colors.white),
       value: currentValue,
       items: _languages.entries.map((entry) {
         return DropdownMenuItem<String>(

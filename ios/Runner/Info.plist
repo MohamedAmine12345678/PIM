@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CADisableMinimumFrameDurationOnPhone</key>
+    <true/>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
@@ -22,18 +24,62 @@
     <string>????</string>
     <key>CFBundleVersion</key>
     <string>$(FLUTTER_BUILD_NUMBER)</string>
-    <key>LSRequiresIPhoneOS</key>
+
+    <!-- Google Maps API Key -->
+    <key>GMSApiKey</key>
+    <string>YOUR_GOOGLE_MAPS_API_KEY</string>
+
+    <!-- Location Permissions -->
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We need your location to provide accurate emergency assistance at all times.</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need your location to provide accurate emergency assistance while using the app.</string>
+
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We need your location to provide accurate emergency assistance at all times, even in the background.</string>
+
+    <key>NSLocationUsageDescription</key>
+    <string>We need access to your location to find nearby emergency services.</string>
+
+    <!-- Optional Permissions -->
+    <key>NSCameraUsageDescription</key>
+    <string>We need access to your camera to allow you to take photos for reports.</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need access to the microphone to listen for speech input for emergency reporting.</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your photo library to allow you to upload images related to emergencies.</string>
+
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>We need access to speech recognition to convert your speech to text for emergency reports.</string>
+
+    <!-- Enable location tracking in the background -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+    </array>
+
+    <!-- Required for iOS apps -->
+    <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+
+    <!-- Launch Screen and supported orientations -->
     <key>UILaunchStoryboardName</key>
     <string>LaunchScreen</string>
     <key>UIMainStoryboardFile</key>
     <string>Main</string>
+
+    <!-- Interface orientations -->
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+
+    <!-- iPad specific orientations -->
     <key>UISupportedInterfaceOrientations~ipad</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
@@ -41,41 +87,9 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-    <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
-    <key>UIApplicationSupportsIndirectInputEvents</key>
-    <true/>
 
-    <!-- Photo Library Usage Permission -->
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>We need access to your photo library to allow you to upload images.</string>
-
-    <!-- Camera Usage Permission -->
-    <key>NSCameraUsageDescription</key>
-    <string>We need access to your camera to allow you to take photos.</string>
-
-    <!-- Microphone Usage Permission -->
-    <key>NSMicrophoneUsageDescription</key>
-    <string>We need access to the microphone to listen for speech input.</string>
-
-    <!-- Speech Recognition Usage Permission -->
-    <key>NSSpeechRecognitionUsageDescription</key>
-    <string>We need access to speech recognition to convert your speech to text.</string>
-
-    <!-- Location Services Usage Permission -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>We need your location to provide accurate emergency assistance.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>We need your location to provide accurate emergency assistance.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>We need your location to provide accurate emergency assistance.</string>
-    <key>NSLocationUsageDescription</key>
-    <string>We need access to your location to find nearby emergency services.</string>
-
-    <!-- Google Maps API Key -->
+    <!-- Embedded views for Flutter -->
     <key>io.flutter.embedded_views_preview</key>
     <true/>
-    <key>GMSApiKey</key>
-    <string>AIzaSyBs5tjfTL9RUNymqNpig2YOQGFoAMIaQ4s</string>
 </dict>
 </plist>

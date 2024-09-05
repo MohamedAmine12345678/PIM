@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:video_player/video_player.dart';
 
 class CurrencyConversionScreen extends StatefulWidget {
   @override
@@ -35,27 +36,42 @@ class _CurrencyConversionScreenState extends State<CurrencyConversionScreen> {
 
   List<String> _filteredFromCurrencies = [];
   List<String> _filteredToCurrencies = [];
+  late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
 
   @override
   void initState() {
     super.initState();
     _filteredFromCurrencies = _currencies;
     _filteredToCurrencies = _currencies;
+
+    // Initialize the video background
+    _controller = VideoPlayerController.asset('assets/7579667-uhd_2160_4096_25fps.mp4');
+    _initializeVideoPlayerFuture = _controller.initialize().then((_) {
+      _controller.setLooping(true);
+      _controller.play();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _filterCurrencies(String input, bool isFromCurrency) {
     setState(() {
       if (isFromCurrency) {
-        _filteredFromCurrencies = _currencies.where((currency) =>
-            currency.toLowerCase().startsWith(input.toLowerCase())).toList();
-        // Ensure the selected currency is in the list
+        _filteredFromCurrencies = _currencies
+            .where((currency) => currency.toLowerCase().startsWith(input.toLowerCase()))
+            .toList();
         if (!_filteredFromCurrencies.contains(_fromCurrency)) {
           _fromCurrency = _filteredFromCurrencies.isNotEmpty ? _filteredFromCurrencies.first : '';
         }
       } else {
-        _filteredToCurrencies = _currencies.where((currency) =>
-            currency.toLowerCase().startsWith(input.toLowerCase())).toList();
-        // Ensure the selected currency is in the list
+        _filteredToCurrencies = _currencies
+            .where((currency) => currency.toLowerCase().startsWith(input.toLowerCase()))
+            .toList();
         if (!_filteredToCurrencies.contains(_toCurrency)) {
           _toCurrency = _filteredToCurrencies.isNotEmpty ? _filteredToCurrencies.first : '';
         }
@@ -94,107 +110,133 @@ class _CurrencyConversionScreenState extends State<CurrencyConversionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true, // Extend the body behind the transparent AppBar
       appBar: AppBar(
-        title: Text('Currency Conversion'),
-        backgroundColor: Color(0xFF162447),
+        title: Text(
+          'Currency Conversion',
+          style: TextStyle(color: Colors.white.withOpacity(0.9)),
+        ),
+        backgroundColor: Colors.black.withOpacity(0.3), // Transparent black header
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Search From Currency',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                _filterCurrencies(value, true);
-              },
-            ),
-            SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                labelText: 'From Currency',
-                border: OutlineInputBorder(),
-              ),
-              value: _filteredFromCurrencies.contains(_fromCurrency) ? _fromCurrency : null,
-              items: _filteredFromCurrencies.map((String currency) {
-                return DropdownMenuItem<String>(
-                  value: currency,
-                  child: Text(currency),
+      body: Stack(
+        children: [
+          FutureBuilder(
+            future: _initializeVideoPlayerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return SizedBox.expand(
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _controller.value.size.width,
+                      height: _controller.value.size.height,
+                      child: VideoPlayer(_controller),
+                    ),
+                  ),
                 );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _fromCurrency = value!;
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Search To Currency',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                _filterCurrencies(value, false);
-              },
-            ),
-            SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                labelText: 'To Currency',
-                border: OutlineInputBorder(),
-              ),
-              value: _filteredToCurrencies.contains(_toCurrency) ? _toCurrency : null,
-              items: _filteredToCurrencies.map((String currency) {
-                return DropdownMenuItem<String>(
-                  value: currency,
-                  child: Text(currency),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _toCurrency = value!;
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Amount',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  _inputAmount = double.tryParse(value) ?? 1.0;
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _convertCurrency,
-              child: _isLoading ? CircularProgressIndicator(color: Colors.white) : Text('Convert'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF4077FF),
-              ),
-            ),
-            SizedBox(height: 20),
-            if (_convertedAmount != null)
-              Text(
-                '$_inputAmount $_fromCurrency = $_convertedAmount $_toCurrency',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF162447),
+              } else {
+                return Container(color: Colors.black);
+              }
+            },
+          ),
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildClearTextField('Search From Currency', (value) => _filterCurrencies(value, true)),
+                    SizedBox(height: 20),
+                    _buildClearDropdown('From Currency', _filteredFromCurrencies, _fromCurrency, (value) {
+                      setState(() {
+                        _fromCurrency = value!;
+                      });
+                    }),
+                    SizedBox(height: 20),
+                    _buildClearTextField('Search To Currency', (value) => _filterCurrencies(value, false)),
+                    SizedBox(height: 20),
+                    _buildClearDropdown('To Currency', _filteredToCurrencies, _toCurrency, (value) {
+                      setState(() {
+                        _toCurrency = value!;
+                      });
+                    }),
+                    SizedBox(height: 20),
+                    _buildClearTextField('Amount', (value) {
+                      setState(() {
+                        _inputAmount = double.tryParse(value) ?? 1.0;
+                      });
+                    }, keyboardType: TextInputType.number),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _convertCurrency,
+                      child: _isLoading ? CircularProgressIndicator(color: Colors.white) : Text('Convert'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black.withOpacity(0.5), // Semi-transparent button
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    if (_convertedAmount != null)
+                      Text(
+                        '$_inputAmount $_fromCurrency = $_convertedAmount $_toCurrency',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildClearTextField(String label, Function(String) onChanged, {TextInputType keyboardType = TextInputType.text}) {
+    return TextField(
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white.withOpacity(0.85)), // Brighter transparent label
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.5)), // Transparent border
+        ),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.2), // Lighter transparent background
+      ),
+      keyboardType: keyboardType,
+      style: TextStyle(color: Colors.white.withOpacity(0.9)),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildClearDropdown(String label, List<String> items, String value, Function(String?) onChanged) {
+    return DropdownButtonFormField<String>(
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white.withOpacity(0.85)), // Brighter transparent label
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.5)), // Transparent border
+        ),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.2), // Lighter transparent background
+      ),
+      dropdownColor: Colors.black.withOpacity(0.8), // Set dropdown background color
+      value: value,
+      items: items.map((String currency) {
+        return DropdownMenuItem<String>(
+          value: currency,
+          child: Text(
+            currency,
+            style: TextStyle(color: Colors.white.withOpacity(0.9)),
+          ),
+        );
+      }).toList(),
+      onChanged: onChanged,
     );
   }
 }
